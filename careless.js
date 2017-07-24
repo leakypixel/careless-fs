@@ -33,6 +33,9 @@ function writeFileList(list) {
 
 function readFile(file) {
   return new Promise(function(resolve, reject) {
+    if (typeof file === "string") {
+      file = {path: file};
+    }
     file = Object.assign({}, defaults, file);
     fs.readFile(file.path, file.encoding, function(error, data) {
       if (error) {
@@ -46,6 +49,9 @@ function readFile(file) {
 
 function writeFile(file) {
   return new Promise(function(resolve, reject) {
+    if (typeof file === "string") {
+      file = {path: file};
+    }
     file = Object.assign({}, defaults, file);
     mkdirp(path.dirname(file.path), function(error) {
       if (error) {
