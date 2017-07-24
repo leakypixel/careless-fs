@@ -5,6 +5,32 @@ const defaults = {
   encoding: 'utf-8'
 };
 
+function read(something) {
+  if (Array.isArray(something)) {
+    return readFileList(something);
+  } else {
+    return readFile(something);
+  }
+}
+
+function write(something) {
+  if (Array.isArray(something)) {
+    return writeFileList(something);
+  } else {
+    return writeFile(something);
+  }
+}
+
+function readFileList(list) {
+  let files = list.map((file) => readFile(file));
+  return Promise.all(files);
+}
+
+function writeFileList(list) {
+  let files = list.map((file) => writeFile(file));
+  return Promise.all(files);
+}
+
 function readFile(file) {
   return new Promise(function(resolve, reject) {
     file = Object.assign({}, defaults, file);
@@ -37,6 +63,6 @@ function writeFile(file) {
 }
 
 module.exports = {
-  read: readFile,
-  write: writeFile
+  read: read,
+  write: write
 };
