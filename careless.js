@@ -41,7 +41,8 @@ function readFile(file) {
       if (error) {
         reject(error);
       } else {
-        resolve(data);
+        file.content = data;
+        resolve(file);
       }
     });
   });
@@ -57,11 +58,11 @@ function writeFile(file) {
       if (error) {
         reject(error);
       }
-      fs.writeFile(file.path, file.data, function(error) {
+      fs.writeFile(file.path, file.content, function(error) {
         if (error) {
           reject(error);
         } else {
-          resolve(file.path);
+          resolve(file);
         }
       });
     });
