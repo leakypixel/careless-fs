@@ -1,6 +1,6 @@
 {
   "name": "careless-fs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Promises and defaults to make reading and writing files a breeze",
   "main": "careless.js",
   "scripts": {
