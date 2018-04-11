@@ -1,7 +1,7 @@
 {
   "name": "careless-fs",
   "version": "1.0.0",
-  "description": "Simple, using defaults and promises file read and write.",
+  "description": "Promises and defaults to make reading and writing files a breeze",
   "main": "careless.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
