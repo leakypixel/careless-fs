@@ -2,23 +2,21 @@ const fs = require("fs");
 const path = require("path");
 const mkdirp = require("mkdirp");
 const defaults = {
-  encoding: 'utf-8'
+  encoding: "utf-8"
 };
 
 function read(something) {
   if (Array.isArray(something)) {
     return readFileList(something);
-  } else {
-    return readFile(something);
   }
+  return readFile(something);
 }
 
 function write(something) {
   if (Array.isArray(something)) {
     return writeFileList(something);
-  } else {
-    return writeFile(something);
   }
+  return writeFile(something);
 }
 
 function readFileList(list) {
@@ -54,10 +52,7 @@ function writeFile(file) {
       file = {path: file};
     }
     file = Object.assign({}, defaults, file);
-    mkdirp(path.dirname(file.path), function(error) {
-      if (error) {
-        reject(error);
-      }
+    mkdirp(path.dirname(file.path), function() {
       fs.writeFile(file.path, file.content, function(error) {
         if (error) {
           reject(error);
