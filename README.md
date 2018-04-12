@@ -1,5 +1,8 @@
 Careless FS
 ===
+[![Build Status](https://api.travis-ci.org/leakypixel/careless-fs.svg)](https://travis-ci.org/leakypixel/careless-fs)
+[![Code Climate](https://codeclimate.com/github/leakypixel/careless-fs/badges/gpa.svg)](https://codeclimate.com/github/leakypixel/careless-fs)
+[![Test Coverage](https://codeclimate.com/github/leakypixel/careless-fs/badges/coverage.svg)](https://codeclimate.com/github/leakypixel/careless-fs/coverage)
 
 Promises and defaults to make reading and writing files a breeze. Makes the directory if it doesn't exist on write, takes no mode operations and passes errors through promise rejections.
 

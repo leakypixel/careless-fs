@@ -7,6 +7,10 @@
   "scripts": {
     "test": "istanbul cover -x **/spec/** jasmine-node spec/"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leakypixel/careless-fs.git"
+  },
   "author": "Craig Fletcher (hi@leakypixel.net)",
   "license": "GPL v2",
   "dependencies": {
