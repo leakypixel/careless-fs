@@ -1,8 +1,7 @@
 {
   "name": "careless-fs",
-  "version": "1.0.1",
-  "description":
-    "Promises and defaults to make reading and writing files a breeze",
+  "version": "1.0.2",
+  "description": "Promises and defaults to make reading and writing files a breeze",
   "main": "careless.js",
   "scripts": {
     "test": "istanbul cover -x **/spec/** jasmine-node spec/"
