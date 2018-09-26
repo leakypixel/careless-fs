@@ -20,19 +20,22 @@ function write(something) {
 }
 
 function readFileList(list) {
-  let files = list.map((file) => readFile(file));
+  let files = list.map(file => readFile(file));
   return Promise.all(files);
 }
 
 function writeFileList(list) {
-  let files = list.map((file) => writeFile(file));
+  let files = list.map(file => writeFile(file));
   return Promise.all(files);
 }
 
 function readFile(file) {
   return new Promise(function(resolve, reject) {
     if (typeof file === "string") {
-      file = {path: file};
+      file = { path: file };
+    }
+    if (!file.path) {
+      reject(file);
     }
     file = Object.assign({}, defaults, file);
     fs.readFile(file.path, file.encoding, function(error, data) {
@@ -49,7 +52,10 @@ function readFile(file) {
 function writeFile(file) {
   return new Promise(function(resolve, reject) {
     if (typeof file === "string") {
-      file = {path: file};
+      file = { path: file };
+    }
+    if (!file.path) {
+      reject(file);
     }
     file = Object.assign({}, defaults, file);
     mkdirp(path.dirname(file.path), function() {
