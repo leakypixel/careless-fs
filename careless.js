@@ -1,8 +1,27 @@
 const fs = require("fs");
 const path = require("path");
 const mkdirp = require("mkdirp");
-const defaults = {
-  encoding: "utf-8"
+const intoStream = require("into-stream");
+const isStream = require("is-stream");
+
+const writeDefaults = {
+  encoding: "utf-8",
+  flags: "w",
+  mode: 0o666,
+  autoClose: true,
+  emitClose: false,
+  start: 0
+};
+
+const readDefaults = {
+  encoding: "utf-8",
+  flags: "r",
+  mode: 0o666,
+  highWaterMark: 64 * 1024,
+  autoClose: true,
+  emitClose: false,
+  start: 0,
+  end: Infinity
 };
 
 function read(something) {
@@ -31,19 +50,37 @@ function writeFileList(list) {
 
 function readFile(file) {
   return new Promise(function(resolve, reject) {
-    if (typeof file === "string") {
-      file = { path: file };
-    }
-    if (!file.path) {
+    const fileObject = (() => {
+      if (typeof file === "string") {
+        return Object.assign({}, readDefaults, { path: file });
+      }
+      return Object.assign({}, readDefaults, file);
+    })();
+    if (!fileObject.path) {
       reject(file);
     }
-    file = Object.assign({}, defaults, file);
-    fs.readFile(file.path, file.encoding, function(error, data) {
+    const options = {
+      encoding: fileObject.encoding,
+      mode: fileObject.mode,
+      flags: fileObject.flags,
+      highWaterMark: fileObject.highWaterMark,
+      autoClose: fileObject.autoClose,
+      emitClose: fileObject.emitClose,
+      start: fileObject.start,
+      end: fileObject.end
+    };
+    if (fileObject.stream) {
+      resolve(
+        Object.assign(fileObject, {
+          content: fs.createReadStream(fileObject.path, options)
+        })
+      );
+    }
+    fs.readFile(fileObject.path, fileObject.encoding, function(error, data) {
       if (error) {
         reject(error);
       } else {
-        file.content = data;
-        resolve(file);
+        resolve(Object.assign(fileObject, { content: data }));
       }
     });
   });
@@ -51,21 +88,35 @@ function readFile(file) {
 
 function writeFile(file) {
   return new Promise(function(resolve, reject) {
-    if (typeof file === "string") {
-      file = { path: file };
-    }
-    if (!file.path) {
+    const fileObject = (() => {
+      if (typeof file === "string") {
+        return Object.assign({}, writeDefaults, { path: file });
+      }
+      return Object.assign({}, writeDefaults, file);
+    })();
+    if (!fileObject.path) {
       reject(file);
     }
-    file = Object.assign({}, defaults, file);
-    mkdirp(path.dirname(file.path), function() {
-      fs.writeFile(file.path, file.content, function(error) {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(file);
-        }
-      });
+    const options = {
+      encoding: fileObject.encoding,
+      mode: fileObject.mode,
+      flags: fileObject.flags,
+      autoClose: fileObject.autoClose,
+      emitClose: fileObject.emitClose,
+      start: fileObject.start
+    };
+    mkdirp(path.dirname(fileObject.path), function() {
+      const readStream = isStream(file.content)
+        ? file.content
+        : intoStream(file.content || "");
+      readStream
+        .pipe(fs.createWriteStream(fileObject.path, options))
+        .on("error", err => {
+          reject(err);
+        })
+        .on("finish", function() {
+          resolve(fileObject);
+        });
     });
   });
 }

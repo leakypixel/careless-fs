@@ -10,21 +10,48 @@ const permissionErrorCode = "EACCES";
 const emptyObject = {};
 const filePathArray = [filePath, filePath, filePath];
 const file = fs.readFileSync(filePath, fileEncoding);
-const fileObject = {path: filePath};
+const fileObject = { path: filePath };
 const fileObjectArray = [fileObject, fileObject, fileObject];
-const expectedFileObject = {
+const expectedWriteFileObject = {
   path: filePath,
   encoding: fileEncoding,
-  content: file.toString()
+  content: file.toString(),
+  flags: "w",
+  mode: 0o666,
+  autoClose: true,
+  emitClose: false,
+  start: 0
+};
+const expectedReadFileObject = {
+  path: filePath,
+  encoding: fileEncoding,
+  content: file.toString(),
+  flags: "r",
+  mode: 0o666,
+  autoClose: true,
+  emitClose: false,
+  start: 0,
+  end: Infinity,
+  highWaterMark: 64 * 1024
 };
 const newFileObject = {
   path: newFilePath,
   encoding: fileEncoding,
-  content: file.toString()
+  content: file.toString(),
+  flags: "w",
+  mode: 0o666,
+  autoClose: true,
+  emitClose: false,
+  start: 0
 };
 const emptyNewFile = {
   path: newFilePath,
   encoding: fileEncoding,
+  flags: "w",
+  mode: 0o666,
+  autoClose: true,
+  emitClose: false,
+  start: 0
 };
 const newFileObjectArray = [newFileObject, newFileObject, newFileObject];
 
@@ -41,7 +68,8 @@ module.exports = {
   file,
   fileObject,
   fileObjectArray,
-  expectedFileObject,
+  expectedReadFileObject,
+  expectedWriteFileObject,
   newFileObject,
   emptyNewFile,
   newFileObjectArray

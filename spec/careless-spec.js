@@ -12,7 +12,7 @@ const {
   filePathArray,
   fileObject,
   fileObjectArray,
-  expectedFileObject,
+  expectedReadFileObject,
   newFileObject,
   emptyNewFile,
   newFileObjectArray
@@ -21,14 +21,14 @@ const {
 describe("File read function", function() {
   it("Should return a file object with the correct values when passed a path string", function(done) {
     careless.read(filePath).then(data => {
-      expect(data).toEqual(expectedFileObject);
+      expect(data).toEqual(expectedReadFileObject);
       done();
     });
   });
 
   it("Should return a file with the correct values when passed a file object", function(done) {
     careless.read(fileObject).then(data => {
-      expect(data).toEqual(expectedFileObject);
+      expect(data).toEqual(expectedReadFileObject);
       done();
     });
   });

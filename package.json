@@ -4,7 +4,7 @@
   "description": "Promises and defaults to make reading and writing files a breeze",
   "main": "careless.js",
   "scripts": {
-    "test": "istanbul cover -x **/spec/** jasmine-node spec/"
+    "test": "nyc --reporter=lcov --reporter=text-summary jasmine"
   },
   "repository": {
     "type": "git",
@@ -13,12 +13,14 @@
   "author": "Craig Fletcher (hi@leakypixel.net)",
   "license": "GPL v2",
   "dependencies": {
+    "into-stream": "^5.1.1",
+    "is-stream": "^2.0.0",
     "mkdirp": "^0.5.1"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
     "eslint-plugin-jasmine": "^2.9.3",
-    "istanbul": "0.4.x",
-    "jasmine-node": "^2.0.1"
+    "jasmine": "^3.5.0",
+    "nyc": "^14.1.1"
   }
 }
