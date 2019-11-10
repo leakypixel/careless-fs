@@ -14,44 +14,23 @@ const fileObject = { path: filePath };
 const fileObjectArray = [fileObject, fileObject, fileObject];
 const expectedWriteFileObject = {
   path: filePath,
-  encoding: fileEncoding,
   content: file.toString(),
-  flags: "w",
-  mode: 0o666,
-  autoClose: true,
-  emitClose: false,
-  start: 0
+  encoding: "utf-8"
 };
 const expectedReadFileObject = {
   path: filePath,
-  encoding: fileEncoding,
   content: file.toString(),
-  flags: "r",
-  mode: 0o666,
-  autoClose: true,
-  emitClose: false,
-  start: 0,
-  end: Infinity,
-  highWaterMark: 64 * 1024
+  encoding: "utf-8"
 };
 const newFileObject = {
   path: newFilePath,
-  encoding: fileEncoding,
-  content: file.toString(),
-  flags: "w",
-  mode: 0o666,
-  autoClose: true,
-  emitClose: false,
-  start: 0
+  encoding: "utf-8",
+  content: file.toString()
 };
 const emptyNewFile = {
   path: newFilePath,
-  encoding: fileEncoding,
-  flags: "w",
-  mode: 0o666,
-  autoClose: true,
-  emitClose: false,
-  start: 0
+  encoding: "utf-8",
+  content: ""
 };
 const newFileObjectArray = [newFileObject, newFileObject, newFileObject];
 

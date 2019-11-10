@@ -4,26 +4,6 @@ const mkdirp = require("mkdirp");
 const intoStream = require("into-stream");
 const isStream = require("is-stream");
 
-const writeDefaults = {
-  encoding: "utf-8",
-  flags: "w",
-  mode: 0o666,
-  autoClose: true,
-  emitClose: false,
-  start: 0
-};
-
-const readDefaults = {
-  encoding: "utf-8",
-  flags: "r",
-  mode: 0o666,
-  highWaterMark: 64 * 1024,
-  autoClose: true,
-  emitClose: false,
-  start: 0,
-  end: Infinity
-};
-
 function read(something) {
   if (Array.isArray(something)) {
     return readFileList(something);
@@ -48,74 +28,103 @@ function writeFileList(list) {
   return Promise.all(files);
 }
 
+function getOptions(possibleOptions, defaults, givenOptions) {
+  const options = possibleOptions.reduce(
+    (definedOptions, option) =>
+      givenOptions[option]
+        ? Object.assign({}, definedOptions, { [option]: givenOptions[option] })
+        : definedOptions,
+    defaults
+  );
+  return options;
+}
+
+function getReadOptions(fileObject) {
+  const readOptions = [
+    "encoding",
+    "mode",
+    "flags",
+    "highWaterMark",
+    "autoClose",
+    "emitClose",
+    "start",
+    "end"
+  ];
+  const readDefaults = { encoding: "utf-8" };
+  return getOptions(readOptions, readDefaults, fileObject);
+}
+
+function ensureFileObject(file) {
+  if (typeof file === "string") {
+    return { path: file, content: "" };
+  }
+  return Object.assign({}, file, { content: file.content || "" });
+}
+
+function mergeToFileObject(fileObject, content, options) {
+  return Object.assign({}, fileObject, { content }, options);
+}
+
 function readFile(file) {
   return new Promise(function(resolve, reject) {
-    const fileObject = (() => {
-      if (typeof file === "string") {
-        return Object.assign({}, readDefaults, { path: file });
-      }
-      return Object.assign({}, readDefaults, file);
-    })();
+    const fileObject = ensureFileObject(file);
     if (!fileObject.path) {
       reject(file);
     }
-    const options = {
-      encoding: fileObject.encoding,
-      mode: fileObject.mode,
-      flags: fileObject.flags,
-      highWaterMark: fileObject.highWaterMark,
-      autoClose: fileObject.autoClose,
-      emitClose: fileObject.emitClose,
-      start: fileObject.start,
-      end: fileObject.end
-    };
+
+    const options = getReadOptions(fileObject);
     if (fileObject.stream) {
       resolve(
-        Object.assign(fileObject, {
-          content: fs.createReadStream(fileObject.path, options)
-        })
+        mergeToFileObject(
+          fileObject,
+          fs.createReadStream(fileObject.path, options),
+          options
+        )
       );
+    } else {
+      fs.readFile(fileObject.path, options, function(error, data) {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(mergeToFileObject(fileObject, data, options));
+        }
+      });
     }
-    fs.readFile(fileObject.path, fileObject.encoding, function(error, data) {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(Object.assign(fileObject, { content: data }));
-      }
-    });
   });
+}
+
+function getWriteOptions(fileObject) {
+  const writeOptions = [
+    "encoding",
+    "mode",
+    "flags",
+    "autoClose",
+    "emitClose",
+    "start"
+  ];
+  const writeDefaults = { encoding: "utf-8" };
+  return getOptions(writeOptions, writeDefaults, fileObject);
+}
+
+function ensureReadStream(content) {
+  return isStream(content) ? content : intoStream(content);
 }
 
 function writeFile(file) {
   return new Promise(function(resolve, reject) {
-    const fileObject = (() => {
-      if (typeof file === "string") {
-        return Object.assign({}, writeDefaults, { path: file });
-      }
-      return Object.assign({}, writeDefaults, file);
-    })();
+    const fileObject = ensureFileObject(file);
     if (!fileObject.path) {
       reject(file);
     }
-    const options = {
-      encoding: fileObject.encoding,
-      mode: fileObject.mode,
-      flags: fileObject.flags,
-      autoClose: fileObject.autoClose,
-      emitClose: fileObject.emitClose,
-      start: fileObject.start
-    };
+    const options = getWriteOptions(fileObject);
     mkdirp(path.dirname(fileObject.path), function() {
-      const readStream = isStream(file.content)
-        ? file.content
-        : intoStream(file.content || "");
-      readStream
+      ensureReadStream(fileObject.content)
         .pipe(fs.createWriteStream(fileObject.path, options))
         .on("error", err => {
           reject(err);
         })
         .on("finish", function() {
-          resolve(fileObject);
+          resolve(mergeToFileObject(fileObject, fileObject.content, options));
         });
     });
   });
